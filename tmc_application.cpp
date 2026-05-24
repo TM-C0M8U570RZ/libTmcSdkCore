@@ -9,7 +9,8 @@ Application::Application(int argc,
                          char** argv,
                          const std::filesystem::path& exefsDir,
                          const std::filesystem::path& romfsDir,
-                         const std::string& packageName)
+                         const std::string& packageName,
+                         AgeRating ar)
 {
     globalInstance = this;
     args = std::vector<std::string>(argc);
@@ -62,15 +63,59 @@ Application::Application(int argc,
     this->exefsDir = exefsDir;
     this->romfsDir = romfsDir;
     this->packageName = packageName;
+    this->ar = ar;
 }
 
 Application* Application::getGlobalInstance(int argc,
                                             char** argv,
                                             const std::filesystem::path& exefsDir,
                                             const std::filesystem::path& romfsDir,
-                                            const std::string& packageName)
+                                            const std::string& packageName,
+                                            AgeRating ar)
 {
-    if (argc != 0 && argv != nullptr) Application* a = new Application(argc, argv, exefsDir, romfsDir, packageName);
+    if (argc != 0 && argv != nullptr)
+    {
+        Application* a = new Application(argc, argv, exefsDir, romfsDir, packageName, ar);
+        if (a->hasArg("TMC-QUERY-EXEFS-DIR"))
+        {
+            std::cout << exefsDir << "\n";
+            exit(0);
+        }
+        else if (a->hasArg("TMC-QUERY-ROMFS-DIR"))
+        {
+            std::cout << romfsDir << "\n";
+            exit(0);
+        }
+        else if (a->hasArg("TMC-QUERY-PACKAGE-NAME"))
+        {
+            std::cout << packageName << "\n";
+            exit(0);
+        }
+        else if (a->hasArg("TMC-QUERY-AGE-RATING"))
+        {
+            switch (ar)
+            {
+            case AgeRating::EC: // The software is educational software for preschool-age kids
+                std::cout << "EC\n";
+                exit(0);
+            case AgeRating::E: // The software is safe for all ages
+                std::cout << "E\n";
+                exit(0);
+            case AgeRating::E10: // The software is for ages 10 and up (contains content such as mild crude humor and simulated gambling)
+                std::cout << "E10\n";
+                exit(0);
+            case AgeRating::T: // The software is for teens and adults (Contains content such as mild blood and some swearing)
+                std::cout << "T\n";
+                exit(0);
+            case AgeRating::M: // The software is for ages 17 and up (Contains content such as nudity without sexual acts and extreme violence)
+                std::cout << "M\n";
+                exit(0);
+            case AgeRating::AO: // The software is only for adults (contains content such as pornography and real gambling)
+                std::cout << "AO\n";
+                exit(0);
+            }
+        }
+    }
     return globalInstance;
 }
 
@@ -96,6 +141,26 @@ std::vector<bool> Application::getAs(const std::string& longArg)
         result.push_back(toAllUpper(longArgs[idx].second[i]) == "TRUE");
     }
     return result;
+}
+
+std::filesystem::path Application::resolveResource(const std::string& resourcePath)
+{
+    std::size_t slashPos = resourcePath.find("/");
+    if (slashPos != std::string::npos && slashPos != 0)
+    {
+        std::string topLevel = resourcePath.substr(0, slashPos);
+        std::string relativeResource = resourcePath.substr(slashPos + 1);
+        if (!ignCaseStrComp(topLevel, "@romfs") || !ignCaseStrComp(topLevel, "romfs:"))
+        {
+            return getRomfsDir() / relativeResource;
+        }
+        else if (!ignCaseStrComp(topLevel, "@exefs") || !ignCaseStrComp(topLevel, "exefs:"))
+        {
+            return getExefsDir() / relativeResource;
+        }
+        return resourcePath;
+    }
+    return resourcePath;
 }
 
 template <>

@@ -9,6 +9,7 @@
 #include "tmc_global_types.h"
 #include <filesystem>
 #include <cstdlib>
+#include <iostream>
 
 namespace tmc {
 
@@ -20,7 +21,8 @@ public:
                                           char** argv = nullptr,
                                           const std::filesystem::path& exefsDir = std::filesystem::path(),
                                           const std::filesystem::path& romfsDir = std::filesystem::path(),
-                                          const std::string& packageName = "org.TMC0M8U570RZ.TmcApp");
+                                          const std::string& packageName = "org.TMC0M8U570RZ.TmcApp",
+                                          AgeRating ar = AgeRating::E);
 
     template <class T>
     T getAs(const std::string& longArg);
@@ -52,12 +54,15 @@ public:
 
     std::filesystem::path getLocalConfigDir();
 
+    std::filesystem::path resolveResource(const std::string& resourcePath);
+
 protected:
     Application(int argc,
                 char** argv,
                 const std::filesystem::path& exefsDir = std::filesystem::path(),
                 const std::filesystem::path& romfsDir = std::filesystem::path(),
-                const std::string& packageName = "org.TMC0M8U570RZ.TmcApp");
+                const std::string& packageName = "org.TMC0M8U570RZ.TmcApp",
+                AgeRating ar = AgeRating::E);
     std::vector<std::string> args;
     std::vector<std::pair<char, std::vector<std::string>>> shortArgs;
     std::vector<std::pair<std::string, std::vector<std::string>>> longArgs;
@@ -65,6 +70,7 @@ protected:
     std::filesystem::path exefsDir;
     std::filesystem::path romfsDir;
     std::string packageName;
+    AgeRating ar;
 
     std::vector<char> processShortArgs(std::string shortArgs);
 };
