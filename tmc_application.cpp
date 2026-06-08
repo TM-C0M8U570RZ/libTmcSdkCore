@@ -1404,6 +1404,15 @@ std::string Application::getPackageName()
 std::filesystem::path Application::getLocalConfigDir()
 {
 #ifdef ID_JUST_LIKE_TO_INTERJECT
+    if (std::filesystem::exists(getExefsDir() / "bearer.sh") &&
+        args[0] == std::filesystem::path(getExefsDir() / "bin" / std::filesystem::path(args[0]).filename()).string()) // is packaged as a .melpak
+    {
+        std::filesystem::path result = getenv("HOME");
+        result /= ".var/melpak";
+        result /= packageName;
+        result /= "@savedata";
+        return result;
+    }
     std::filesystem::path result = getenv("HOME");
     result /= ".local/share";
     result /= packageName;
@@ -1417,5 +1426,22 @@ std::filesystem::path Application::getLocalConfigDir()
 #endif
     return result;
 }
+
+#ifdef ID_JUST_LIKE_TO_INTERJECT
+std::filesystem::path Application::getGlobalConfigDir() // This function is currently only for Linux.  The directory returned by this should be owned by root.
+{
+    if (std::filesystem::exists(getExefsDir() / "bearer.sh") &&
+        args[0] == std::filesystem::path(getExefsDir() / "bin" / std::filesystem::path(args[0]).filename()).string()) // is packaged as a .melpak
+    {
+        std::filesystem::path result = "/var/lib/melpak/app_mounts";
+        result /= packageName;
+        result /= "@savedata";
+        return result;
+    }
+    std::filesystem::path result = "/etc";
+    result /= packageName;
+    return result;
+}
+#endif
 
 } // namespace tmc

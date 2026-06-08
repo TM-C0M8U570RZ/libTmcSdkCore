@@ -56,6 +56,10 @@ public:
 
     std::filesystem::path resolveResource(const std::string& resourcePath);
 
+#ifdef ID_JUST_LIKE_TO_INTERJECT
+    std::filesystem::path getGlobalConfigDir();
+#endif
+
 protected:
     Application(int argc,
                 char** argv,
