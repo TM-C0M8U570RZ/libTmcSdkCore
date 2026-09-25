@@ -36,7 +36,9 @@ public:
         return args;
     }
 
-    inline std::vector<std::filesystem::path> getFilePaths()
+    std::vector<std::filesystem::path> getFilePaths();
+
+    inline std::vector<std::string> getFilePathsAsStrings()
     {
         return filepaths;
     }
@@ -70,7 +72,7 @@ protected:
     std::vector<std::string> args;
     std::vector<std::pair<char, std::vector<std::string>>> shortArgs;
     std::vector<std::pair<std::string, std::vector<std::string>>> longArgs;
-    std::vector<std::filesystem::path> filepaths;
+    std::vector<std::string> filepaths;
     std::filesystem::path exefsDir;
     std::filesystem::path romfsDir;
     std::string packageName;

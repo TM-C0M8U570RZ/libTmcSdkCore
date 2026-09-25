@@ -57,13 +57,23 @@ Application::Application(int argc,
     {
         for (u64 i = fileStart; i < args.size(); i++)
         {
-            filepaths.push_back(std::filesystem::path(args[i]));
+            filepaths.push_back(std::string(args[i]));
         }
     }
     this->exefsDir = exefsDir;
     this->romfsDir = romfsDir;
     this->packageName = packageName;
     this->ar = ar;
+}
+
+std::vector<std::filesystem::path> Application::getFilePaths()
+{
+    std::vector<std::filesystem::path> result(filepaths.size(), std::filesystem::path());
+    for (u64 i = 0; i < filepaths.size(); i++)
+    {
+        result[i] = filepaths[i];
+    }
+    return result;
 }
 
 Application* Application::getGlobalInstance(int argc,
@@ -1408,7 +1418,7 @@ std::filesystem::path Application::getLocalConfigDir()
         args[0] == std::filesystem::path(getExefsDir() / "bin" / std::filesystem::path(args[0]).filename()).string()) // is packaged as a .melpak
     {
         std::filesystem::path result = getenv("HOME");
-        result /= ".var/melpak";
+        result /= ".var/melpak/app_mounts";
         result /= packageName;
         result /= "@savedata";
         return result;
