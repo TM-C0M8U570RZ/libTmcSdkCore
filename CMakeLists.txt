@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(TmcSdkCore LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(TmcSdkCore SHARED
+add_library(TmcSdkCore STATIC
   TmcSdkCore_global.h
   tmc_application.cpp
   tmc_application.h
